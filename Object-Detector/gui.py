@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import filedialog
 from PIL import ImageTk, Image
 import boto3
+import cv2
 
 region = "ap-south-1"
 bucket = "tkobdetectproject"
