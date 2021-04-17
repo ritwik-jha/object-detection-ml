@@ -11,7 +11,7 @@ rek = boto3.client('rekognition' , region )
 
 root = Tk()
 root.title('Image Detector')
-root.geometry('1110x800')
+root.geometry('1110x810')
 root.resizable(0,0)
 
 def load_image():
@@ -26,13 +26,13 @@ def load_image():
     global image_label
     image_label = Label(root, image=image)
     frame_1.destroy()
-    image_label.grid(row=0, column=0, columnspan=3)
+    image_label.grid(row=0, column=0, columnspan=5)
 
 def remove_image():
     image_label.destroy()
     frame_1 = LabelFrame(root)
-    frame_1.grid(row=0, column=0, padx=10, columnspan=3)
-    Label(frame_1, text='Put Your Image').grid(row=0, column=0, columnspan=3, padx=500, pady=300)
+    frame_1.grid(row=0, column=0, padx=10, columnspan=5)
+    Label(frame_1, text='Put Your Image').grid(row=0, column=0, columnspan=5, padx=500, pady=300)
 
 def object_detect(response):
     imgWidth, imgHeight = img.size
@@ -89,17 +89,29 @@ def rek_connection():
 
 
 frame_1 = LabelFrame(root)
-frame_1.grid(row=0, column=0, padx=10, columnspan=3)
+frame_1.grid(row=0, column=0, padx=10, columnspan=5)
 
-Label(frame_1, text='Put Your Image').grid(row=0, column=0, columnspan=3, padx=500, pady=300)
+Label(frame_1, text='Put Your Image').grid(row=0, column=0, columnspan=5, padx=500, pady=300)
 
 load_button = Button(root, text='Load Image', command=load_image, padx=20, pady=20)
 load_button.grid(row=1, column=0, pady=20)
 
-submit_button = Button(root, text='Submit', command=rek_connection, padx=20, pady=20)
-submit_button.grid(row=1, column=1)
-
 clear_image_button = Button(root, text='Remove Image', command=remove_image, padx=20, pady=20)
-clear_image_button.grid(row=1, column=2)
+clear_image_button.grid(row=1, column=4)
+
+ob_detect_button = Button(root, text='Object Detection', command=rek_connection, padx=20, pady=20)
+ob_detect_button.grid(row=2, column=0, pady=10)
+
+face_ana_button = Button(root, text='Expression Analysis', command=rek_connection, padx=20, pady=20)
+face_ana_button.grid(row=2, column=1, pady=10)
+
+celeb_recog_button = Button(root, text='Celebrity Recognition', command=rek_connection, padx=20, pady=20)
+celeb_recog_button.grid(row=2, column=2, pady=10)
+
+text_in_image_button = Button(root, text='Extract Text', command=rek_connection, padx=20, pady=20)
+text_in_image_button.grid(row=2, column=3, pady=10)
+
+face_comp_button = Button(root, text='Face Comparison', command=rek_connection, padx=20, pady=20)
+face_comp_button.grid(row=2, column=4, pady=10)
 
 root.mainloop()
