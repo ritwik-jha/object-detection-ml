@@ -15,7 +15,7 @@ root.geometry('1110x810')
 root.resizable(0,0)
 
 def load_image():
-    root.filename = filedialog.askopenfilename(initialdir='/', title='Select Image', filetypes=(('png files','*.png'), ('jpg files','*.jpg')))
+    root.filename = filedialog.askopenfilename(initialdir='C:/Users/Ritwik Jha/Desktop/Resources/PROJECTS/graphical/Object-Detector', title='Select Image', filetypes=(('png files','*.png'), ('jpg files','*.jpg')))
     global image_loc
     image_loc = root.filename
     global image
@@ -67,7 +67,7 @@ def object_detect(response):
     img.show()
 
 
-def rek_connection(): 
+def rek_connection_ob_detect(): 
     s3.Bucket(bucket).upload_file(image_loc , 'image_to_detect.png')
     rek = boto3.client('rekognition' , region )
     response = rek.detect_labels(
@@ -82,6 +82,59 @@ def rek_connection():
     )
     object_detect(response)
 
+def expression_detect(response):
+    imgWidth, imgHeight = img.size
+    
+    faces = []
+    global img_la
+    global im1
+    global display_im
+    x = response['FaceDetails']
+    for i in range(len(x)):
+        y = x[i]
+        box = y['BoundingBox']
+        w = box['Width']
+        h = box['Height']
+        l = box['Left']
+        t = box['Top']
+        left = imgWidth * l
+        top = imgHeight * t
+        width = imgWidth * w
+        height = imgHeight * h
+        im1 = img.crop((left, top, left+width, top+height))
+        im1 = im1.resize((300, 300), Image.ANTIALIAS)
+        #faces.append(im1)
+        #print(im1)
+        display_im = ImageTk.PhotoImage(im1)
+        #print(display_im)
+        op_win = Toplevel()
+        img_la = Label(op_win, image=display_im)
+        img_la.grid(row=0, column=0)
+
+    #for face in faces:
+    #display = faces[0]
+    #display_im = ImageTk.PhotoImage(display)
+    #img_la = Label(op_win, image=image)
+    #img_la.grid(row=0, column=0)
+
+    
+
+
+def rek_connection(): 
+    s3.Bucket(bucket).upload_file(image_loc , 'image_to_detect.png')
+    rek = boto3.client('rekognition' , region )
+    response = rek.detect_faces(
+    Image= {
+        "S3Object": {
+            "Bucket": bucket,
+            "Name": "image_to_detect.png"
+        }
+    },
+    Attributes= [
+        "ALL"
+    ]
+    )
+    expression_detect(response)
 
     
 
@@ -99,7 +152,7 @@ load_button.grid(row=1, column=0, pady=20)
 clear_image_button = Button(root, text='Remove Image', command=remove_image, padx=20, pady=20)
 clear_image_button.grid(row=1, column=4)
 
-ob_detect_button = Button(root, text='Object Detection', command=rek_connection, padx=20, pady=20)
+ob_detect_button = Button(root, text='Object Detection', command=rek_connection_ob_detect, padx=20, pady=20)
 ob_detect_button.grid(row=2, column=0, pady=10)
 
 face_ana_button = Button(root, text='Expression Analysis', command=rek_connection, padx=20, pady=20)
