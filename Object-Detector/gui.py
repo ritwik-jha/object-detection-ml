@@ -3,6 +3,8 @@ from tkinter import filedialog
 from PIL import ImageTk, Image, ImageDraw, ExifTags, ImageColor, ImageFont
 import boto3
 import cv2
+import random
+import string
 
 region = "ap-south-1"
 bucket = "tkobdetectproject"
@@ -83,11 +85,9 @@ def rek_connection_ob_detect():
     object_detect(response)
 
 def expression_detect(response):
-    imgWidth, imgHeight = img.size
-    
+    #global img_la
+    #global im1
     faces = []
-    global img_la
-    global im1
     global display_im
     x = response['FaceDetails']
     for i in range(len(x)):
@@ -97,26 +97,31 @@ def expression_detect(response):
         h = box['Height']
         l = box['Left']
         t = box['Top']
+        face = Image.open(image_loc)
+        imgWidth, imgHeight = face.size
         left = imgWidth * l
         top = imgHeight * t
         width = imgWidth * w
         height = imgHeight * h
-        im1 = img.crop((left, top, left+width, top+height))
-        im1 = im1.resize((300, 300), Image.ANTIALIAS)
-        #faces.append(im1)
-        #print(im1)
-        display_im = ImageTk.PhotoImage(im1)
-        #print(display_im)
+        cropped_face = face.crop((left, top, left+width, top+height))
+        cropped_face = cropped_face.resize((300, 300), Image.ANTIALIAS)
+        display_im = ImageTk.PhotoImage(cropped_face)
         op_win = Toplevel()
         img_la = Label(op_win, image=display_im)
         img_la.grid(row=0, column=0)
-
-    #for face in faces:
-    #display = faces[0]
-    #display_im = ImageTk.PhotoImage(display)
-    #img_la = Label(op_win, image=image)
-    #img_la.grid(row=0, column=0)
-
+        age = y['AgeRange']
+        age_string = 'Age: {} to {}'.format(age['Low'],age['High'])
+        Label(op_win, text=age_string).grid(row=1, column=0, padx=10, 
+        pady=10)
+        Label(op_win, text='APPEARENCE:').grid(row=3, column=0, sticky=W)
+        Label(op_win, text='Smile: {}'.format(y['Smile']['Value'])).grid(row=4, column=0)
+        Label(op_win, text='Eyeglasses: {}'.format(y['Eyeglasses']['Value'])).grid(row=5, column=0)
+        Label(op_win, text='Sunglasses: {}'.format(y['Sunglasses']['Value'])).grid(row=6, column=0)
+        Label(op_win, text='Gender: {}'.format(y['Gender']['Value'])).grid(row=7, column=0)
+        Label(op_win, text='Beard: {}'.format(y['Beard']['Value'])).grid(row=8, column=0)
+        Label(op_win, text='EMOTIONS:').grid(row=9, column=0, sticky=W)
+        for k in range(len(y['Emotions'])):
+            Label(op_win, text='{}: {}'.format(y['Emotions'][k]['Type'], y['Emotions'][k]['Confidence'])).grid(row=10+k, column=0)
     
 
 
