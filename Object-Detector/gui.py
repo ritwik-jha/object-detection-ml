@@ -15,6 +15,7 @@ root = Tk()
 root.title('Image Detector')
 root.geometry('1110x810')
 root.resizable(0,0)
+#root.configure(bg='grey')
 
 def load_image():
     root.filename = filedialog.askopenfilename(initialdir='C:/Users/Ritwik Jha/Desktop/Resources/PROJECTS/graphical/Object-Detector', title='Select Image', filetypes=(('png files','*.png'), ('jpg files','*.jpg')))
@@ -125,7 +126,7 @@ def expression_detect(response):
     
 
 
-def rek_connection(): 
+def rek_connection_expression(): 
     s3.Bucket(bucket).upload_file(image_loc , 'image_to_detect.png')
     rek = boto3.client('rekognition' , region )
     response = rek.detect_faces(
@@ -141,6 +142,72 @@ def rek_connection():
     )
     expression_detect(response)
 
+def celeb_detect(response):
+    global celeb_image_processed
+    celeb_image = Image.open(image_loc)
+    draw = ImageDraw.Draw(celeb_image)
+    imgWidth, imgHeight = celeb_image.size
+    x = response['CelebrityFaces'][0]['Name']
+    y = response['CelebrityFaces'][0]['Face']['BoundingBox']
+    w = y['Width']
+    h = y['Height']
+    l = y['Left']
+    t = y['Top']
+
+    left = imgWidth * l
+    top = imgHeight * t
+    width = imgWidth * w
+    height = imgHeight * h
+
+    points = (
+                    (left,top),
+                    (left + width, top),
+                    (left + width, top + height),
+                    (left , top + height),
+                    (left, top)
+                    )
+    draw.rectangle([left,top, left + width, top + height], outline='#00FF00')
+    celeb_image = celeb_image.resize((600, 600), Image.ANTIALIAS)
+    celeb_image_processed = ImageTk.PhotoImage(celeb_image)
+    op_win = Toplevel()
+    Label(op_win, image=celeb_image_processed).grid(row=0, column=0)
+    Label(op_win, text=x, font=20).grid(row=1, column=0, padx=20, pady=20)
+
+
+    
+
+def rek_connection_celeb(): 
+    s3.Bucket(bucket).upload_file(image_loc , 'image_to_detect.png')
+    rek = boto3.client('rekognition' , region )
+    response = rek.recognize_celebrities(
+    Image= {
+        "S3Object": {
+            "Bucket": bucket,
+            "Name": "image_to_detect.png"
+        }
+    },
+    )
+    celeb_detect(response)
+
+def text_detect(response):
+    op_win = Toplevel()
+    #op_win.geometry('300x300')
+    for i in range(len(response['TextDetections'])):
+        if response['TextDetections'][i]['Type'] == 'WORD':
+            Label(op_win, text=response['TextDetections'][i]['DetectedText'], font=20).grid(row=i, column=0)
+
+def rek_connection_text():
+    s3.Bucket(bucket).upload_file(image_loc , 'image_to_detect.png')
+    rek = boto3.client('rekognition' , region )
+    response = rek.detect_text(
+    Image= {
+        "S3Object": {
+            "Bucket": bucket,
+            "Name": "image_to_detect.png"
+        }
+    },
+    )
+    text_detect(response)
     
 
 
@@ -160,16 +227,16 @@ clear_image_button.grid(row=1, column=4)
 ob_detect_button = Button(root, text='Object Detection', command=rek_connection_ob_detect, padx=20, pady=20)
 ob_detect_button.grid(row=2, column=0, pady=10)
 
-face_ana_button = Button(root, text='Expression Analysis', command=rek_connection, padx=20, pady=20)
+face_ana_button = Button(root, text='Expression Analysis', command=rek_connection_expression, padx=20, pady=20)
 face_ana_button.grid(row=2, column=1, pady=10)
 
-celeb_recog_button = Button(root, text='Celebrity Recognition', command=rek_connection, padx=20, pady=20)
+celeb_recog_button = Button(root, text='Celebrity Recognition', command=rek_connection_celeb, padx=20, pady=20)
 celeb_recog_button.grid(row=2, column=2, pady=10)
 
-text_in_image_button = Button(root, text='Extract Text', command=rek_connection, padx=20, pady=20)
+text_in_image_button = Button(root, text='Extract Text', command=rek_connection_text, padx=20, pady=20)
 text_in_image_button.grid(row=2, column=3, pady=10)
 
-face_comp_button = Button(root, text='Face Comparison', command=rek_connection, padx=20, pady=20)
+face_comp_button = Button(root, text='Face Comparison', command=rek_connection_celeb, padx=20, pady=20)
 face_comp_button.grid(row=2, column=4, pady=10)
 
 root.mainloop()
