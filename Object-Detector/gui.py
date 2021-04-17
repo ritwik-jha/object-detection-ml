@@ -11,7 +11,7 @@ rek = boto3.client('rekognition' , region )
 
 root = Tk()
 root.title('Image Detector')
-root.geometry('1110x725')
+root.geometry('1110x800')
 root.resizable(0,0)
 
 def load_image():
