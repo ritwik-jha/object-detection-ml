@@ -91,6 +91,7 @@ def expression_detect(response):
     faces = []
     global display_im
     x = response['FaceDetails']
+    op_win = Toplevel()
     for i in range(len(x)):
         y = x[i]
         box = y['BoundingBox']
@@ -107,22 +108,22 @@ def expression_detect(response):
         cropped_face = face.crop((left, top, left+width, top+height))
         cropped_face = cropped_face.resize((300, 300), Image.ANTIALIAS)
         display_im = ImageTk.PhotoImage(cropped_face)
-        op_win = Toplevel()
+        
         img_la = Label(op_win, image=display_im)
         img_la.grid(row=0, column=0)
         age = y['AgeRange']
         age_string = 'Age: {} to {}'.format(age['Low'],age['High'])
-        Label(op_win, text=age_string).grid(row=1, column=0, padx=10, 
+        Label(op_win, text=age_string).grid(row=1, column=i, padx=10, 
         pady=10)
-        Label(op_win, text='APPEARENCE:').grid(row=3, column=0, sticky=W)
-        Label(op_win, text='Smile: {}'.format(y['Smile']['Value'])).grid(row=4, column=0)
-        Label(op_win, text='Eyeglasses: {}'.format(y['Eyeglasses']['Value'])).grid(row=5, column=0)
-        Label(op_win, text='Sunglasses: {}'.format(y['Sunglasses']['Value'])).grid(row=6, column=0)
-        Label(op_win, text='Gender: {}'.format(y['Gender']['Value'])).grid(row=7, column=0)
-        Label(op_win, text='Beard: {}'.format(y['Beard']['Value'])).grid(row=8, column=0)
-        Label(op_win, text='EMOTIONS:').grid(row=9, column=0, sticky=W)
+        Label(op_win, text='APPEARENCE:').grid(row=3, column=i, sticky=W)
+        Label(op_win, text='Smile: {}'.format(y['Smile']['Value'])).grid(row=4, column=i)
+        Label(op_win, text='Eyeglasses: {}'.format(y['Eyeglasses']['Value'])).grid(row=5, column=i)
+        Label(op_win, text='Sunglasses: {}'.format(y['Sunglasses']['Value'])).grid(row=6, column=i)
+        Label(op_win, text='Gender: {}'.format(y['Gender']['Value'])).grid(row=7, column=i)
+        Label(op_win, text='Beard: {}'.format(y['Beard']['Value'])).grid(row=8, column=i)
+        Label(op_win, text='EMOTIONS:').grid(row=9, column=i, sticky=W)
         for k in range(len(y['Emotions'])):
-            Label(op_win, text='{}: {}'.format(y['Emotions'][k]['Type'], y['Emotions'][k]['Confidence'])).grid(row=10+k, column=0)
+            Label(op_win, text='{}: {}'.format(y['Emotions'][k]['Type'], y['Emotions'][k]['Confidence'])).grid(row=10+k, column=i)
     
 
 
@@ -208,8 +209,48 @@ def rek_connection_text():
     },
     )
     text_detect(response)
-    
 
+def comp_image_load(number):
+    global face_comp_image_loc
+    face_comp_image_loc = {}
+    global image_1
+    global image_label
+    root.filename = filedialog.askopenfilename(initialdir='C:/Users/Ritwik Jha/Desktop/Resources/PROJECTS/graphical/Object-Detector', 
+    title='Select Image', filetypes=(('png files','*.png'), ('jpg files','*.jpg')))
+    if number == 1:
+        face_comp_image_loc['first_image_loc'] = root.filename
+        first_img = Image.open(face_comp_image_loc['first_image_loc'])
+        first_img = first_img.resize((400, 400), Image.ANTIALIAS)
+        image_1 = ImageTk.PhotoImage(first_img)
+        image_label_1 = Label(new_win, image=image_1)
+        #image_frame_1.destroy()
+        image_label_1.grid(row=0, column=0)
+    
+    elif number == 2:
+        face_comp_image_loc['second_image_loc'] = root.filename
+        second_img = Image.open(face_comp_image_loc['second_image_loc'])
+        second_img = second_img.resize((400, 400), Image.ANTIALIAS)
+        image_2 = ImageTk.PhotoImage(second_img)
+        image_label_2 = Label(new_win, image=image_2)
+        #image_frame_2.destroy()
+        image_label_2.grid(row=2, column=1)
+def face_comp():
+    #root.destroy()
+    global new_win
+    new_win = Toplevel()
+    new_win.title('Face Comparison')
+    new_win.geometry('1210x800')
+    global image_frame_1
+    img_frame_1 = LabelFrame(new_win)
+    img_frame_1.grid(row=0, column=0, padx=5, pady=10)
+    global image_frame_2
+    img_frame_2 = LabelFrame(new_win)
+    img_frame_2.grid(row=0, column=1, padx=5, pady=10)
+    Label(img_frame_1, text='Put Your Image').grid(row=0, column=0, padx=250, pady=250)
+    Label(img_frame_2, text='Put Your Image').grid(row=0, column=0, padx=250, pady=250)
+    Button(new_win, text='Load First Image', command= lambda: comp_image_load(1), padx=5, pady=5).grid(row=1, column=0, padx=10, pady=10)
+    Button(new_win, text='Load Second Image', command= lambda: comp_image_load(2), padx=5, pady=5).grid(row=1, column=1, padx= 10, pady=10)
+    #new_win.mainloop()
 
 
 
@@ -236,7 +277,7 @@ celeb_recog_button.grid(row=2, column=2, pady=10)
 text_in_image_button = Button(root, text='Extract Text', command=rek_connection_text, padx=20, pady=20)
 text_in_image_button.grid(row=2, column=3, pady=10)
 
-face_comp_button = Button(root, text='Face Comparison', command=rek_connection_celeb, padx=20, pady=20)
+face_comp_button = Button(root, text='Face Comparison', command=face_comp, padx=20, pady=20)
 face_comp_button.grid(row=2, column=4, pady=10)
 
 root.mainloop()
