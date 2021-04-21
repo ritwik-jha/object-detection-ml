@@ -34,7 +34,7 @@ def load_image():
 def remove_image():
     image_label.destroy()
     frame_1 = LabelFrame(root)
-    frame_1.grid(row=0, column=0, padx=10, columnspan=5)
+    frame_1.grid(row=0, column=0, padx=10, columnspan=4)
     Label(frame_1, text='Put Your Image').grid(row=0, column=0, columnspan=5, padx=500, pady=300)
 
 def object_detect(response):
@@ -67,7 +67,11 @@ def object_detect(response):
             draw.rectangle([left,top, left + width, top + height], outline='#00FF00')
             #draw.text(((points[2][0]+points[3][0])/2,(points[2][1]+points[3][1])/2), response['Labels'][i]['Name'], fill=(0,0,0))
             draw.text((left+20,top+20), '{0}'.format(name), fill=(0,0,0), font=font)
-    img.show()
+    op_win = Toplevel()
+    global final_img
+    final_img = ImageTk.PhotoImage(img)
+    Label(op_win, image=final_img).grid(row=0, column=0)
+    #img.show()
 
 
 def rek_connection_ob_detect(): 
@@ -123,7 +127,8 @@ def expression_detect(response):
         Label(op_win, text='Beard: {}'.format(y['Beard']['Value'])).grid(row=8, column=i)
         Label(op_win, text='EMOTIONS:').grid(row=9, column=i, sticky=W)
         for k in range(len(y['Emotions'])):
-            Label(op_win, text='{}: {}'.format(y['Emotions'][k]['Type'], y['Emotions'][k]['Confidence'])).grid(row=10+k, column=i)
+            if y['Emotions'][k]['Confidence'] >= 80:
+                Label(op_win, text='{}'.format(y['Emotions'][k]['Type'])).grid(row=10+k, column=i)
     
 
 
@@ -255,7 +260,7 @@ def face_comp():
 
 
 frame_1 = LabelFrame(root)
-frame_1.grid(row=0, column=0, padx=10, columnspan=5)
+frame_1.grid(row=0, column=0, padx=10, columnspan=4)
 
 Label(frame_1, text='Put Your Image').grid(row=0, column=0, columnspan=5, padx=500, pady=300)
 
@@ -263,7 +268,7 @@ load_button = Button(root, text='Load Image', command=load_image, padx=20, pady=
 load_button.grid(row=1, column=0, pady=20)
 
 clear_image_button = Button(root, text='Remove Image', command=remove_image, padx=20, pady=20)
-clear_image_button.grid(row=1, column=4)
+clear_image_button.grid(row=1, column=3)
 
 ob_detect_button = Button(root, text='Object Detection', command=rek_connection_ob_detect, padx=20, pady=20)
 ob_detect_button.grid(row=2, column=0, pady=10)
@@ -277,7 +282,7 @@ celeb_recog_button.grid(row=2, column=2, pady=10)
 text_in_image_button = Button(root, text='Extract Text', command=rek_connection_text, padx=20, pady=20)
 text_in_image_button.grid(row=2, column=3, pady=10)
 
-face_comp_button = Button(root, text='Face Comparison', command=face_comp, padx=20, pady=20)
-face_comp_button.grid(row=2, column=4, pady=10)
+#face_comp_button = Button(root, text='Face Comparison', command=face_comp, padx=20, pady=20)
+#face_comp_button.grid(row=2, column=4, pady=10)
 
 root.mainloop()
