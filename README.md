@@ -31,3 +31,10 @@ python gui.py
 ```
 
 This will launch the application 
+![image](https://user-images.githubusercontent.com/59885389/116109267-41126680-a6d2-11eb-8d0d-fc88ebe65132.png)
+
+## Demo
+First we load the image and then press the desired button.
+### Object Detection 
+
+
