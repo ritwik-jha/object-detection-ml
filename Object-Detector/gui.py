@@ -29,7 +29,7 @@ def load_image():
     global image_label
     image_label = Label(root, image=image)
     frame_1.destroy()
-    image_label.grid(row=0, column=0, columnspan=5)
+    image_label.grid(row=0, column=0, columnspan=4)
 
 def remove_image():
     image_label.destroy()
