@@ -17,6 +17,15 @@ root.geometry('1110x810')
 root.resizable(0,0)
 #root.configure(bg='grey')
 
+def creating_s3_bucket():
+    if region is None:
+        s3_client = boto3.client('s3')
+        s3_client.create_bucket(Bucket=bucket)
+    else:
+        s3_client = boto3.client('s3', region_name=region)
+        location = {'LocationConstraint': region}
+        s3_client.create_bucket(Bucket=bucket, CreateBucketConfiguration=location)
+
 def load_image():
     root.filename = filedialog.askopenfilename(initialdir='C:/Users/Ritwik Jha/Desktop/Resources/PROJECTS/graphical/Object-Detector', title='Select Image', filetypes=(('png files','*.png'), ('jpg files','*.jpg')))
     global image_loc
@@ -258,7 +267,7 @@ def face_comp():
     #new_win.mainloop()
 
 
-
+creating_s3_bucket()
 frame_1 = LabelFrame(root)
 frame_1.grid(row=0, column=0, padx=10, columnspan=4)
 
