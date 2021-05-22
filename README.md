@@ -1,4 +1,4 @@
-# IMAGE OBJECT DETECTOR
+# OBJECT DETECTOR
 
 ## Description
 Object Detector is an desktop app made using python tkinter framework and aws rekognition service at backend. This app is a frontend for aws rek. We have used the aws rek api to
